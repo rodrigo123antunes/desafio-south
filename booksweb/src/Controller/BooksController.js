@@ -7,16 +7,14 @@ class BooksController extends AppController {
             this.showSpinner();
             const response = await Book.search(search, startIndex);
 
-            console.log(response.data);
-
             this.context.setState({
-                "listBooks": response.data.items,
-                "totalBooks": response.data.totalItems
-            })
+                "listBooks": response.data.items ? response.data.items : [],
+                "totalBooks": response.data.totalItems,
+                "bookNotFound": response.data.totalItems === 0 ? `Sem resultados para '${search}'!` : ""
+            });
             this.hideSpinner();
         } catch (err) {
-            console.log(err);
-            alert(err.detail);
+            alert(err);
             this.hideSpinner();
         }
     }

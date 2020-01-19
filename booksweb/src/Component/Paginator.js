@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import ReactPaginate from 'react-paginate';
 
 export default class Paginator extends Component {
 
@@ -12,45 +13,31 @@ export default class Paginator extends Component {
         };
     }
 
-    componentWillUpdate(nextProps, nextState, nextContext) {
+    componentWillUpdate(nextProps) {
         if (this.state.total !== nextProps.total) {
             this.setState({"total" : nextProps.total});
         }
     }
 
     render() {
-        const total = this.state.total;
-        const limit = this.state.limit;
-        const records = total / limit;
-
-        let renderButtons = [];
-        for (let i = 0; i < records; i += 1) {
-            const position = i + 1;
-            const startIndex = limit * i;
-
-            renderButtons.push(
-                <li
-                    key={`paginate-${position}`}
-                    className={`page-item ${this.state.active === position ? "active" : ""}`}
-                >
-                    <button
-                        className="page-link"
-                        onClick={() => {
-                            this.setState({"active" : position});
-                            this.props.onPress(startIndex);
-                        }}>
-                        {position}
-                    </button>
-                </li>
-            );
-        }
-
         return (
-            <nav>
-                <ul className="pagination">
-                    {renderButtons}
-                </ul>
-            </nav>
+            <ReactPaginate
+                previousLabel={"<"}
+                nextLabel={">"}
+                breakLabel={"..."}
+                breakClassName={"break-me"}
+                pageCount={this.state.total}
+                marginPagesDisplayed={2}
+                pageRangeDisplayed={5}
+                onPageChange={data => {
+                    const startIndex = data.selected;
+
+                    this.props.onPress(startIndex);
+                }}
+                containerClassName={"pagination"}
+                subContainerClassName={"pagination"}
+                activeClassName={"active"}
+            />
         );
     }
 }
