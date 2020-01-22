@@ -47,7 +47,7 @@ export default class Home extends Component {
                             data-testid="field-search"
                             onChange={(e) => this.setState({"search": e.target.value})}
                             onKeyDown={(e) => this.search(e)}
-                            value={this.props.search}
+                            value={this.state.search}
                             className="form-control"
                             placeholder="Informe a pesquisa e pressione ENTER"
                             aria-label="Search"
@@ -76,7 +76,7 @@ export default class Home extends Component {
                     <li className="nav-item">
                         <a className="nav-link active" id="search-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" onClick={() => this.setState({"search": "", "tabSelected": 0})}>Busca</a>
                     </li>
-                    <li className="nav-item">
+                    <li className="nav-item" onClick={() => this.setState({"search": ""})}>
                         <a className="nav-link" id="favorite-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" onClick={() => this.setState({"search": "", "tabSelected": 1})}>Favoritos</a>
                     </li>
                 </ul>
@@ -143,7 +143,7 @@ export default class Home extends Component {
                     <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="favorite-tab">
                         {
                             favorites.length > 0 ? (
-                                <table className="table table-hover">
+                                <table className="table table-hover mt-2">
                                     <thead>
                                         <tr>
                                             <th scope="col">Título</th>
