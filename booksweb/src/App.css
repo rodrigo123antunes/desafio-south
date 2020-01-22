@@ -42,3 +42,7 @@ body {
     background-color:  #2c689c;
     color: white;
 }
+
+.cursor-pointer {
+    cursor: pointer;
+}
