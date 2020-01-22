@@ -8,12 +8,10 @@ export default class Home extends Component {
         this.state = {
             "search": "",
             "bookNotFound": "",
-            "tabSelected": 0,
             "startIndex": 0,
             "totalBooks": 0,
             "listBooks": [],
             "listBooksFavorites": [],
-            "listBooksFavoritesAux": [],
             "bookDetail": {}
         };
 
@@ -37,7 +35,6 @@ export default class Home extends Component {
     }
 
     render() {
-        const favorites = this.state.listBooks.filter(e => e.active === true);
         return (
             <div className="container">
                 <form className="mt-5">
@@ -74,10 +71,10 @@ export default class Home extends Component {
                 </form>
                 <ul className="nav nav-tabs mt-3" id="myTab" role="tablist">
                     <li className="nav-item">
-                        <a className="nav-link active" id="search-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true" onClick={() => this.setState({"search": "", "tabSelected": 0})}>Busca</a>
+                        <a className="nav-link active" id="search-tab" data-toggle="tab" href="#home" role="tab" aria-controls="home" aria-selected="true">Busca</a>
                     </li>
                     <li className="nav-item" onClick={() => this.setState({"search": ""})}>
-                        <a className="nav-link" id="favorite-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false" onClick={() => this.setState({"search": "", "tabSelected": 1})}>Favoritos</a>
+                        <a className="nav-link" id="favorite-tab" data-toggle="tab" href="#profile" role="tab" aria-controls="profile" aria-selected="false">Favoritos</a>
                     </li>
                 </ul>
                 <div className="tab-content" id="myTabContent">
@@ -110,10 +107,13 @@ export default class Home extends Component {
                                                         <td className="text-right">
                                                             <button key={"btn-show"} type="button" className={`${prop.active ? "active" : "" } btn btn-outline-danger`} onClick={() => {
                                                                 prop.active = !prop.active;
+                                                                const data = this.state.listBooksFavorites;
+                                                                data.push(prop.volumeInfo);
 
                                                                 this.setState({
                                                                     "bookDetail": prop.volumeInfo,
                                                                     "listBooks": this.state.listBooks,
+                                                                    "listBooksFavorites": data
                                                                 });
                                                             }}>
                                                                 {prop.active ? "Desfavoritar" : "Favoritar"}
@@ -142,7 +142,7 @@ export default class Home extends Component {
                     </div>
                     <div className="tab-pane fade" id="profile" role="tabpanel" aria-labelledby="favorite-tab">
                         {
-                            favorites.length > 0 ? (
+                            this.state.listBooksFavorites.length > 0 ? (
                                 <table className="table table-hover mt-2">
                                     <thead>
                                         <tr>
@@ -152,22 +152,22 @@ export default class Home extends Component {
                                     </thead>
                                     <tbody>
                                             {
-                                                favorites.map((prop, key) => {
+                                                this.state.listBooksFavorites.map((prop, key) => {
                                                     return (
                                                         <tr key={key}>
                                                             <td data-toggle="modal" data-target="#exampleModal" className="cursor-pointer" onClick={() => {
                                                                 this.setState({
-                                                                    "bookDetail": prop.volumeInfo
+                                                                    "bookDetail": prop
                                                                 });
                                                             }}>
-                                                                {prop.volumeInfo.title}
+                                                                {prop.title}
                                                             </td>
                                                             <td className="text-right">
                                                             <button type="button" className={`${prop.active ? "active" : "" } btn btn-outline-danger`} onClick={() => {
                                                                 prop.active = !prop.active;
 
                                                                 this.setState({
-                                                                    "bookDetail": prop.volumeInfo,
+                                                                    "bookDetail": prop,
                                                                     "listBooks": this.state.listBooks,
                                                                 });
                                                             }}>
