@@ -25,7 +25,8 @@
     },
     "scripts": {
         "test": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha test/**/*.js",
-        "test-code": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha $file"
+        "test-code": "node node_modules/istanbul/lib/cli.js cover node_modules/mocha/bin/_mocha $file",
+        "eslint": "node node_modules/eslint/bin/eslint.js src/**/*.js > eslint.out || (cat eslint.out && exit 1)"
     },
     "author": "",
     "license": "Apache-2.0"
