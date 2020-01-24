@@ -1,11 +1,27 @@
+/* eslint-disable max-statements */
 'use strict';
 
 const AppController = require('./AppController');
 
 class ProductsController extends AppController {
     init() {
-        this.model('Product');
+        this.model([
+            "Product",
+            "User"
+        ]);
         this.logger = this.component('Logger');
+    }
+
+    async validateUserPermission(id) {
+        let allowed = false;
+
+        const user = await this.User.findBy({id});
+
+        if (user.rows[0].perfil === "ADMINISTRATOR") {
+            allowed = true;
+        }
+
+        return allowed;
     }
 
     /**
@@ -13,6 +29,7 @@ class ProductsController extends AppController {
      * @param {function} callback responde para o frontend.
      * @returns {Void} .
      */
+
     async post(callback) {
         let response = {};
         try {
@@ -25,6 +42,16 @@ class ProductsController extends AppController {
             } else if (!this.payload.description) {
                 this.statusCode = 406;
                 throw new Error("Field description cannot be null.");
+            } else if (!this.payload.user_id) {
+                this.statusCode = 406;
+                throw new Error("Field user_id cannot be null.");
+            }
+
+            const hasPermission = await this.validateUserPermission(this.payload.user_id);
+
+            if (!hasPermission) {
+                this.statusCode = 403;
+                throw new Error("User without permission to perform this action.");
             }
 
             //Faz uma busca na base pelo nome do produto.
@@ -35,6 +62,8 @@ class ProductsController extends AppController {
                 this.statusCode = 406;
                 throw new Error("product already registered.");
             }
+
+            Reflect.deleteProperty(this.payload, "user_id");
 
             //Salva o produto.
             const res = await this.Product.save(this.payload);
@@ -70,9 +99,8 @@ class ProductsController extends AppController {
                         "operation": "ILIKE"
                     }
                 ],
-                //paginação de 10 em 10
                 "limit": `10 offset ${this.query.offset}`
-            }
+            };
 
             const res = await this.Product.findAll(params);
             response = this.responseSuccess(res.rows);
@@ -107,6 +135,16 @@ class ProductsController extends AppController {
             } else if (!this.payload.description) {
                 this.statusCode = 406;
                 throw new Error("Field description cannot be null.");
+            } else if (!this.payload.user_id) {
+                this.statusCode = 406;
+                throw new Error("Field user_id cannot be null.");
+            }
+
+            const hasPermission = await this.validateUserPermission(this.payload.user_id);
+
+            if (!hasPermission) {
+                this.statusCode = 403;
+                throw new Error("User without permission to perform this action.");
             }
 
             //Faz uma busca na base pelo nome do produto.
@@ -118,8 +156,47 @@ class ProductsController extends AppController {
                 throw new Error("product already registered.");
             }
 
+            Reflect.deleteProperty(this.payload, "user_id");
+
             //Executa o update
             const res = await this.Product.update(this.payload, {"id": this.id});
+            response = this.responseSuccess(res.rows);
+        } catch (err) {
+            if (!this.statusCode) {
+                this.statusCode = 500;
+            }
+            response = this.responseError("Erro", err.message, this.statusCode);
+            this.logger.error(response);
+        }
+    
+        callback(response);
+    }
+
+    /**
+     * Exclui um determinado produto.
+     * @param {function} callback responde para o frontend.
+     * @returns {Void} .
+     */
+    async delete(callback) {
+        let response = {};
+        try {
+            if (!this.id) {
+                this.statusCode = 406;
+                throw new Error("Field id cannot be null.");
+            } else if (!this.payload.user_id) {
+                this.statusCode = 406;
+                throw new Error("Field user_id cannot be null.");
+            }
+
+            const hasPermission = await this.validateUserPermission(this.payload.user_id);
+
+            if (!hasPermission) {
+                this.statusCode = 403;
+                throw new Error("User without permission to perform this action.");
+            }
+
+            //Executa o delete
+            const res = await this.Product.delete({"id": this.id});
             response = this.responseSuccess(res.rows);
         } catch (err) {
             if (!this.statusCode) {
